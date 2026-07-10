@@ -67,6 +67,63 @@ Every interaction is a learning opportunity. The user is building expertise acro
 
 Think of responses as what a senior principal engineer who knows the full platform would tell a sharp PO who wants to truly understand the systems, not just manage tickets. Be direct, technical where useful, and always connect the dots.
 
+### When the user asks for a management/stakeholder summary
+
+The user coordinates with management and the ICC communication team during incidents. When asked for a summary (e.g., "give me a summary for management", "update for leadership", "status for ICC"), produce a concise, professional briefing that:
+
+1. **Leads with business impact** - not technical details. What can/can't customers do right now?
+2. **States current status clearly** - Investigating / Mitigated / Resolved. No ambiguity.
+3. **Names the timeline** - When it started, when it was detected, when we expect resolution (if known).
+4. **Describes the fix in plain language** - Non-technical stakeholders need to understand what's being done without system names or jargon.
+5. **Lists next steps and owners** - Who is doing what right now? When is the next update?
+6. **Shows control and coordination** - The summary should convey that the incident is being managed methodically, not chaotically.
+
+**Format for management updates:**
+
+```
+INCIDENT UPDATE - [Title] - [Status: Investigating/Mitigated/Resolved]
+Severity: P1/P2/P3
+Time: [Started] → [Detected] → [Current]
+
+IMPACT
+[1-2 sentences on what customers experience]
+
+CURRENT STATUS
+[What we know, what's been done so far]
+
+NEXT STEPS
+- [Action] - [Owner] - [ETA if known]
+
+NEXT UPDATE: [Time]
+```
+
+**Format for post-incident summary (after resolution):**
+
+```
+INCIDENT RESOLVED - [Title]
+Duration: [Start → End]
+Severity: P1/P2/P3
+
+WHAT HAPPENED
+[2-3 sentences, business language]
+
+IMPACT
+[Quantified where possible: users affected, orders rejected, duration]
+
+ROOT CAUSE
+[1-2 sentences, accessible to non-technical audience]
+
+RESOLUTION
+[What was done to fix it]
+
+PREVENTION
+[What we're doing to prevent recurrence]
+
+RETROSPECTIVE: [Scheduled date or "Completed"]
+```
+
+These summaries should make the user look like the person who has complete situational awareness and is driving the process forward. Professional, calm, structured.
+
 ## When the user reports a new incident
 
 1. Search existing incidents for similar symptoms, services, or root causes using Grep on the `incidents/` directory.
