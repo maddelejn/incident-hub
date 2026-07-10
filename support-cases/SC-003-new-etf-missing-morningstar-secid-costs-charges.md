@@ -1,20 +1,20 @@
 ---
 id: SC-003
-title: "New ETF Missing Morningstar secId - Costs and Charges Skipped"
+title: "Missing Fee and Cost Data on New ETF due to Incomplete Morningstar Feed"
 date: 2026-07-10
 status: pending
 requester: "Christopher Barham (via #area-securities-brokerage)"
 requester_team: ""
-service: "morningstar-fund-enrichment, instrument-admin"
+service: "morningstar-fund-enrichment, instrument-admin, etf-page"
 team_responsible: "Team Navigator (Filippa Engstedt, Clara Montgomery), Team Wolf"
-product_owner: "Team Wolf (Madde), Team Mint (Axel Karlsson)"
+product_owner: "Securities Brokerage"
 category: integration
 frequency: occasional
 faq_candidate: true
 tags: [morningstar, secid, fundshareclassid, costs-and-charges, emt, enrichment, new-instrument, race-condition, bnp-paribas, etf, secondary-identifiers]
 ---
 
-# SC-003: New ETF Missing Morningstar secId - Costs and Charges Skipped
+# SC-003: Missing Fee and Cost Data on New ETF due to Incomplete Morningstar Feed
 
 ## Question / Problem
 
@@ -125,6 +125,15 @@ Check Instrument Admin → Secondary identifiers
 
 Classic race condition: the exchange listing gets onboarded into the instrument master before Morningstar finishes classifying the new instrument and assigning granular security identifiers. Common for ETFs launched within the last few weeks/months.
 
+### Standard Operating Procedure for This Pattern
+
+Newly launched or added ETFs/funds from Morningstar may occasionally ingest with incomplete identifier mappings (missing SecID). If CostsAndCharges logs throw a skipping error due to missing IDs:
+
+1. Verify the secondary identifiers in the Morningstar intake row in Instrument Admin
+2. Confirm the `0P...` secId is missing (not just unmapped)
+3. Escalate to Morningstar support for re-mapping (use productsupport@morningstar.com)
+4. Include: ISIN, instrument ID, which product, which API call
+
 ## Open Actions
 
 | Action | Owner | Status |
@@ -135,6 +144,8 @@ Classic race condition: the exchange listing gets onboarded into the instrument 
 ## Links
 
 - **Nordnet ETF page:** https://www.nordnet.se/etf/lista/bnp-paribas-easy-msci-eeab-xeta
+- **ISIN:** LU3243907741
+- **Internal Instrument ID:** 86075d2d-8fe3-4552-9821-9e5e363aa86a
 - **Instrument Admin:** https://instrument-admin.tools.prod.nntech.io/Instruments
 - **Slack thread:** #area-securities-brokerage (2026-07-10)
 
