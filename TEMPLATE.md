@@ -6,11 +6,15 @@ detected_at: "YYYY-MM-DD HH:MM UTC"
 resolved_at: "YYYY-MM-DD HH:MM UTC"
 severity: P1|P2|P3|P4
 status: open|investigating|resolved|post-mortem-done
+domain: trading|post-trade|market-data|instrument-data|funds|customer-facing|compliance-regulatory|infrastructure|payments|identity-access
 service: ""
 team: ""
+product_owner: ""
 category: infrastructure|deployment|data-pipeline|security|performance|configuration|integration|monitoring
 root_cause_category: code-bug|config-change|capacity|dependency-failure|human-error|infrastructure|unknown
 on_call_responder: ""
+retrospective_held: false
+action_items_assigned: false
 tags: []
 ---
 

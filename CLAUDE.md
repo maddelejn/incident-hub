@@ -1,5 +1,30 @@
 # Incident & Support Hub
 
+## About the User
+
+Madelene Söderström (Madde) has two roles:
+
+### Product Owner (day-to-day)
+PO for three areas:
+- **Instrument Intake** (Team Wolf) - instrument onboarding, vendor data pipelines (Morningstar, Millistream, SIX)
+- **Corporate Actions** - corporate action processing, GAV, valuation events
+- **Securities Lending, Securities Borrowing & SFTR** - lending/borrowing operations and regulatory reporting
+
+### Incident Response Team (IRT) - On-call Specialist
+Part of a virtual cross-functional team covering incidents across ALL business areas, not just her PO domains. Driven by **DORA (Digital Operational Resilience Act)** compliance requirements.
+
+**IRT responsibilities:**
+- Assessing reported incidents
+- Ensuring ongoing incidents have needed attention
+- Acting as coordinator when needed
+- Ensuring communication to relevant stakeholders until incident is confirmed resolved
+- Ensuring retrospectives are held
+- Ensuring ownership for identified post-incident action items
+
+The IRT does not replace existing team ownership during incidents. It serves as a supporting force providing guidance, coordination, and resources. Customer communication during incidents is handled by the **ICC team**.
+
+## Purpose
+
 This is a structured knowledge base for incidents and support cases. When working in this project, follow these conventions:
 
 ## Structure
@@ -46,6 +71,32 @@ This is a structured knowledge base for incidents and support cases. When workin
 2. Also include cases with `frequency: occasional` if they share a common topic.
 3. Group by category and service to produce a structured FAQ.
 4. Include the answer/solution from each case as the FAQ answer.
+
+## Business Domains (for IRT cross-area incidents)
+
+Every incident should be tagged with a business domain. This enables pattern analysis across the full organization, not just the PO areas.
+
+- **trading**: Order placement, order routing, exchange connectivity, order validation, blocking/unblocking
+- **post-trade**: Settlement, clearing, reconciliation, corporate actions, securities lending/borrowing
+- **market-data**: Price feeds, valuation prices, real-time data, index data
+- **instrument-data**: Instrument onboarding, intake pipelines, regulatory data (EMT/KID/target market), instrument master
+- **funds**: Mutual fund orders, fund intake, monthly savings, fund enrichment
+- **customer-facing**: Web/app displays, returns graphs, portfolio views, search, screener
+- **compliance-regulatory**: DORA, MiFID II, PRIIPs, SFTR reporting, AML
+- **infrastructure**: Platform, cloud, networking, databases, on-prem core systems
+- **payments**: Deposits, withdrawals, currency exchange
+- **identity-access**: Authentication, authorization, customer identity
+
+### IRT Workflow for Incidents
+
+When handling incidents as IRT on-call:
+
+1. **Assess** - Determine severity, business domain, and customer impact
+2. **Coordinate** - Ensure the right team is engaged and has what they need
+3. **Communicate** - Keep stakeholders informed (ICC handles customer comms)
+4. **Track** - Log the incident in this hub with full timeline
+5. **Follow up** - Ensure retrospective is held and action items have owners
+6. **Close** - Confirm resolution and update status to resolved/post-mortem-done
 
 ## Severity levels
 
