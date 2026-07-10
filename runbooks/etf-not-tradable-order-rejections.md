@@ -131,7 +131,18 @@ Check Admin Trading "Reason" Column
                    (Include: account/orderID, ISIN, error code, exchange/currency)
 ```
 
+## Important: This Runbook vs. Data Regression Incidents
+
+**This runbook covers ETFs that have NEVER had KID/EMT data** - new listings, unregistered regions, or first-time onboarding gaps.
+
+**If an ETF previously HAD working KID/EMT data and it suddenly stopped working**, that is a data regression - not a triage case. Skip this runbook and escalate directly:
+
+- Check if data was removed from RegXchange or the internal pipeline (see INC-002, INC-003)
+- Escalate to **#area-securities-brokerage** with the ISIN and confirmation that it was previously tradable
+
+The recent incidents (INC-002, INC-003) were all regressions where data existed and was then lost, not first-time missing data.
+
 ## Related Incidents
 
-- **INC-002** (Missing Morningstar ETF target_market Data and KID): ETF_KIID_ERROR / EMT_DATA_ERROR caused by ISIN missing from RegXchange on Morningstar's side. Path 3 case - vendor data gap for an established ETF.
-- **INC-003** (Dual-Listed Virtune ETP): EMT_DATA_ERROR caused by internal pipeline mapping failure for dual-listed ETPs. Path 3 case - internal ingestion bug.
+- **INC-002** (Missing Morningstar ETF target_market Data and KID): Data regression - ISIN was removed from RegXchange on Morningstar's side. Previously tradable ETF lost its regulatory data.
+- **INC-003** (Dual-Listed Virtune ETP): Data regression - internal pipeline mapping failure for dual-listed ETPs caused existing regulatory data to not propagate to new market listings.
