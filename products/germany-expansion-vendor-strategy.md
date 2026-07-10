@@ -61,20 +61,94 @@ All three needs pull from the same underlying vendor data. A single vendor contr
 - Tax team buying FTT from vendor C
 - ...when one vendor could serve all three
 
-## Vendors Under Evaluation
+## Coverage Check Results (July 2026)
 
-| Vendor | Coverage | FTT/Tax | EMT/KID | Costs | Format | Status |
-|--------|----------|---------|---------|-------|--------|--------|
-| **WM Daten** | 100% (confirmed) | Yes (German NNA) | Yes | Yes | Proprietary field codes (mapping needed) | Excel received from Funda |
-| **SIX** | 100% TM+Costs, 379/384 KIDs | TBD | Yes | Yes | TBD | Coverage check done |
+Both vendors have only delivered **coverage checks** so far - confirming they have the data, not delivering actual field values or field definitions. The real evaluation requires sample data files from both.
 
-### Decision criteria for August
-1. **FTT/Tax coverage** - Does SIX cover German tax flags as well as WM Daten (Germany's NNA)?
-2. **Data format** - Does SIX deliver standard EMT format? (Would save significant mapping effort vs WM Daten)
-3. **Price** - Full product vs subset pricing
-4. **Integration effort** - Existing SIX relationship vs new WM Daten onboarding
-5. **Multi-market coverage** - SIX covers beyond Xetra; does WM Daten?
-6. **Field-level comparison** - Do both files contain the same actual data points?
+### Side-by-side coverage comparison
+
+| Data Point | SIX | WM Daten |
+|------------|-----|----------|
+| **Instruments checked** | 384 | 383 |
+| **Target Market** | 384/384 **(100%)** | 379/383 (99%) - 4 missing |
+| **Costs & Charges** | 384/384 **(100%)** | 382/383 (99.7%) - 1 missing |
+| **KIDs** | 379/384 (5 missing) | 379/383 (4 missing) |
+| **FTT/Tax data** | **Not confirmed** | **Not in coverage file** |
+
+### Overlapping gaps (same ISINs missing from both vendors)
+
+These ISINs are missing KIDs at both vendors - likely very new or obscure structured products:
+- `XS3269544030`
+- `XS3373414203`
+- `XS3373438483`
+
+### WM Daten additional gaps (not missing at SIX)
+
+| ISIN | Target Market | Costs | KID |
+|------|--------------|-------|-----|
+| `XS2595366340` | Missing | Missing | Missing |
+| `XS3269544030` | Missing | Available | Missing |
+| `XS3373414203` | Missing | Available | Missing |
+| `XS3373438483` | Missing | Available | Missing |
+
+### WM Daten field codes in coverage file
+
+| WM Field | Values | Meaning |
+|----------|--------|---------|
+| `gd100a` | All `1` | Instrument matched/active in WM system |
+| `gd496b` | `1` = available, `2` = not available | KID availability |
+| `gd496c` | `J` = Ja, empty = no | Target market data available |
+| `gd496d` | `J` = Ja, empty = no | Costs & charges data available |
+| `gd198b` | All `4000` | Instrument classification code |
+
+### ISIN country distribution (383 instruments)
+
+| Country | Count | Examples |
+|---------|-------|---------|
+| DE (Germany) | 123 | German-issued ETPs |
+| XS (International) | 85 | Cross-border structured products |
+| GB (United Kingdom) | 62 | UK-issued ETPs |
+| CH (Switzerland) | 47 | Swiss-issued ETPs |
+| JE (Jersey) | 43 | Jersey-issued ETPs |
+| SE (Sweden) | 12 | Swedish-issued ETPs |
+| IE (Ireland) | 10 | Irish-issued ETPs |
+| FR (France) | 1 | French-issued ETP |
+
+## What We Still Need for the August Decision
+
+Neither vendor has provided enough to make a decision yet. Here's what to request:
+
+### From both vendors
+1. **Sample data file** - actual field values for 10-20 instruments, not just "yes/no" coverage
+2. **Field definitions list** - what specific EMT/target market/cost fields are included?
+3. **FTT/Tax data** - do they provide German tax classification flags (Abgeltungsteuer)? This is critical for Team Match and is the make-or-break question
+4. **Data format** - standard EMT CSV? Proprietary? API?
+5. **Delivery mechanism** - SFTP, API, portal?
+6. **Update frequency** - daily, real-time, on-change?
+7. **Pricing** - full product vs subset, per-instrument or flat fee?
+
+### From SIX specifically
+- Confirm FTT/tax data availability (existing Nordnet relationship makes this easiest to ask)
+- What format do they deliver in? If standard EMT, that's a major integration advantage
+
+### From WM Daten specifically
+- Get the actual field-level list Funda referenced (the coverage file only had 5 yes/no fields)
+- Andreas offered to show how to work with WM documentation - schedule that for August
+- Clarify pricing: full data product vs the 10-15% of fields Joachim asked about
+
+## Vendor Comparison Matrix
+
+| Criteria | SIX | WM Daten | Winner |
+|----------|-----|----------|--------|
+| **Coverage (TM + Costs)** | 100% | 99% | SIX |
+| **Coverage (KIDs)** | 98.7% | 98.9% | Tie |
+| **FTT/Tax data** | Unknown | Likely (German NNA) | TBD - critical |
+| **Data format** | TBD | Proprietary (mapping needed) | TBD |
+| **Existing Nordnet vendor** | Yes | No | SIX |
+| **Communication language** | Swedish | English/German | SIX |
+| **Integration effort** | TBD | High (custom mapping) | TBD |
+| **Multi-market coverage** | Yes (confirmed) | TBD | SIX |
+| **Price** | TBD | TBD | TBD |
 
 ## Detailed Vendor Docs
 
@@ -89,7 +163,10 @@ All three needs pull from the same underlying vendor data. A single vendor contr
 | 2026-07-02 | Sent instrument universe to SIX for coverage check |
 | 2026-07-03 | SIX returned coverage results (384 ISINs, 5 missing KIDs) |
 | 2026-07-03 | WM Daten initial discussions (Joachim → Andreas Knabe) |
-| 2026-07-09 | Funda (WM Daten) delivered filtered Excel with ETP-only fields |
-| 2026-07-09 | Both vendor discussions paused for summer vacation |
-| August 2026 | Team sync and vendor comparison. Meeting with SIX booked. |
+| 2026-07-09 | Funda (WM Daten) delivered coverage check Excel (383 ISINs, 5 WM fields) |
+| 2026-07-10 | Analysis: both files are coverage checks only, not actual data |
+| 2026-07-10 | Both vendor discussions paused for summer vacation |
+| August 2026 | Request sample data files and field definitions from both vendors |
+| August 2026 | Team sync (Madde, Pierre, Joachim, Edward) |
+| August 2026 | SIX meeting (booked with Carl) |
 | August 2026 | Vendor decision and contract negotiation |
