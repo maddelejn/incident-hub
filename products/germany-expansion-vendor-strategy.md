@@ -136,25 +136,34 @@ Neither vendor has provided enough to make a decision yet. Here's what to reques
 - Andreas offered to show how to work with WM documentation - schedule that for August
 - Clarify pricing: full data product vs the 10-15% of fields Joachim asked about
 
-## Vendor Comparison Matrix
+## Vendor Comparison Matrix (Updated July 10)
 
 | Criteria | SIX | WM Daten | Winner |
 |----------|-----|----------|--------|
-| **Coverage (TM + Costs)** | 100% | 99% | SIX |
+| **Coverage (TM + Costs)** | 100% | 99% | **SIX** |
 | **Coverage (KIDs)** | 98.7% | 98.9% | Tie |
-| **FTT/Tax data** | Unknown - must ask | **Confirmed** (18 fields, FR/IT/ES) | WM Daten (unless SIX matches) |
-| **Sanctions data (ISM)** | TBD | Available (92002/92003/92004 files) | WM Daten |
-| **Data format** | TBD | Proprietary (mapping needed) | TBD |
-| **Existing Nordnet vendor** | Yes | No | SIX |
-| **Communication language** | Swedish | English/German | SIX |
-| **Integration effort** | TBD | High (custom mapping) | TBD |
-| **Multi-market coverage** | Yes (confirmed) | TBD | SIX |
+| **FTT/Tax data** | **Confirmed** (15 fields, 13+ countries) | Confirmed (18 fields, 3 countries) | **SIX** |
+| **FTT country coverage** | FR, IT, ES, CH, UK, IE, FI, HK + more | FR, IT, ES only | **SIX** |
+| **Sanctions data** | **Already providing to Nordnet** | Available (ISM files) | **SIX** (already in use) |
+| **Data format** | Clean CSV, readable headers | Proprietary WM field codes | **SIX** |
+| **Sample data provided** | Yes (FTT CSV with 350 rows) | Coverage check only (no sample data) | **SIX** |
+| **Existing Nordnet vendor** | Yes | No | **SIX** |
+| **Communication language** | Swedish (Stockholm office) | English/German | **SIX** |
+| **Integration effort** | Low (standard CSV) | High (custom mapping layer needed) | **SIX** |
+| **Multi-market coverage** | Yes (confirmed beyond Xetra) | TBD | **SIX** |
 | **Price** | TBD | TBD | TBD |
+
+### Verdict
+
+**SIX wins on every evaluated criterion except price (TBD).** The remaining open question for August is whether SIX's EMT/KID data for ETPs on Xetra is delivered in a format that's easy to integrate, and pricing.
+
+For detailed FTT field comparison, see: reference/ftt-six-vs-wm-daten-comparison.md
 
 ## Detailed Vendor Docs
 
 - **WM Daten details:** products/germany-etp-vendor-wm-daten.md
 - **SIX details:** products/germany-etp-vendor-six.md
+- **FTT comparison:** reference/ftt-six-vs-wm-daten-comparison.md
 
 ## Timeline
 
