@@ -142,7 +142,8 @@ Neither vendor has provided enough to make a decision yet. Here's what to reques
 |----------|-----|----------|--------|
 | **Coverage (TM + Costs)** | 100% | 99% | SIX |
 | **Coverage (KIDs)** | 98.7% | 98.9% | Tie |
-| **FTT/Tax data** | Unknown | Likely (German NNA) | TBD - critical |
+| **FTT/Tax data** | Unknown - must ask | **Confirmed** (18 fields, FR/IT/ES) | WM Daten (unless SIX matches) |
+| **Sanctions data (ISM)** | TBD | Available (92002/92003/92004 files) | WM Daten |
 | **Data format** | TBD | Proprietary (mapping needed) | TBD |
 | **Existing Nordnet vendor** | Yes | No | SIX |
 | **Communication language** | Swedish | English/German | SIX |
@@ -162,7 +163,8 @@ Neither vendor has provided enough to make a decision yet. Here's what to reques
 | 2026-07-02 | Madde contacted SIX (Carl Sundman) |
 | 2026-07-02 | Sent instrument universe to SIX for coverage check |
 | 2026-07-03 | SIX returned coverage results (384 ISINs, 5 missing KIDs) |
-| 2026-07-03 | WM Daten initial discussions (Joachim → Andreas Knabe) |
+| 2026-02-20 | WM Daten meeting - Vadim Peters shared FTT field list (18 fields) + ISM sanctions data + delivery options |
+| 2026-07-03 | WM Daten ETP discussions (Joachim → Andreas Knabe) |
 | 2026-07-09 | Funda (WM Daten) delivered coverage check Excel (383 ISINs, 5 WM fields) |
 | 2026-07-10 | Analysis: both files are coverage checks only, not actual data |
 | 2026-07-10 | Both vendor discussions paused for summer vacation |
