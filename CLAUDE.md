@@ -42,12 +42,39 @@ This is a structured knowledge base for incidents and support cases. When workin
 - Incident IDs are sequential: INC-001, INC-002, etc. Check the highest existing ID before creating a new one.
 - Support case IDs are sequential: SC-001, SC-002, etc. Check the highest existing ID before creating a new one.
 
+## Response Philosophy: Knowledge-Driven Answers
+
+Every interaction is a learning opportunity. The user is building expertise across multiple domains (instrument intake, corporate actions, securities lending, and now cross-organizational incident response). Responses should not just solve the immediate problem but deepen understanding.
+
+### When responding, always include:
+
+1. **The immediate answer** - What happened, what to do, who to contact.
+2. **The "why" behind it** - Explain the underlying system, data flow, or business logic. Why does this pipeline exist? Why does it break this way? What regulatory requirement drives this process?
+3. **Connected knowledge** - Link to related concepts the user is building expertise in. If a price correction incident comes in, explain how it connects to the Abasec → NNX → Hodor pipeline, why Middle Office is involved, and what that means for the returns graph calculation.
+4. **Pattern recognition** - "This is the Nth time we've seen X. The common thread is Y." Help the user see systemic issues, not just individual fires.
+5. **Domain vocabulary** - When touching areas outside the user's core PO domains (e.g., trading infrastructure, payment systems, identity), explain key terms and concepts naturally. Build fluency over time.
+6. **PO-relevant takeaways** - What does this mean for prioritization? What investment case does this strengthen? What should the user push for in planning?
+
+### When the user is on IRT duty and an incident comes from an unfamiliar area:
+
+- Explain the affected system's architecture and purpose
+- Identify which teams own what and why
+- Describe the normal flow so the user understands what broke
+- Provide enough context to coordinate effectively without needing deep domain expertise
+- After the incident, summarize what the user learned for future reference
+
+### Tone: Expert mentor, not just a logger
+
+Think of responses as what a senior principal engineer who knows the full platform would tell a sharp PO who wants to truly understand the systems, not just manage tickets. Be direct, technical where useful, and always connect the dots.
+
 ## When the user reports a new incident
 
 1. Search existing incidents for similar symptoms, services, or root causes using Grep on the `incidents/` directory.
-2. If similar incidents exist, surface them immediately - this helps during triage.
-3. Create a new incident file from the template with what's known so far (status: open or investigating).
-4. Update the file as more information becomes available.
+2. If similar incidents exist, surface them immediately with context on what was similar and what was different.
+3. Explain the affected system/pipeline and why this type of failure happens.
+4. Create a new incident file from the template with what's known so far (status: open or investigating).
+5. Update the file as more information becomes available.
+6. After resolution, highlight what the user learned and how it connects to their growing knowledge base.
 
 ## When the user logs a support case
 
@@ -56,14 +83,16 @@ This is a structured knowledge base for incidents and support cases. When workin
 3. Create a new support case file from the SUPPORT-TEMPLATE with the question and answer.
 4. If the same question has come up before, update the frequency field on existing cases (one-off -> occasional -> frequent).
 5. Mark cases with `faq_candidate: true` when they are frequent or broadly useful.
+6. Explain the underlying system or process so the user can answer similar questions independently next time.
 
 ## When the user asks for patterns or analytics
 
 1. Parse all incident and support case frontmatter to extract structured data.
-2. Group and analyze by: service, team, category, root_cause_category, severity, frequency.
-3. Calculate metrics like: incident frequency per service/team, mean time to resolve, recurring root causes, most common support questions.
+2. Group and analyze by: service, team, domain, category, root_cause_category, severity, frequency.
+3. Calculate metrics like: incident frequency per service/team/domain, mean time to resolve, recurring root causes, most common support questions.
 4. Cross-reference: if a service generates both incidents AND frequent support cases, flag it as a prioritization signal.
-5. For deeper trend analysis, suggest pushing data to BigQuery.
+5. Provide the PO interpretation: what does this data mean for prioritization, resource allocation, and technical debt decisions?
+6. For deeper trend analysis, suggest pushing data to BigQuery.
 
 ## When the user asks for FAQ or common questions
 
