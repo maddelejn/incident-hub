@@ -19,7 +19,17 @@ Financial Transaction Tax is a tax levied on the purchase of certain financial i
 
 ### How FTT-relevant instruments are determined
 
-Each country publishes an official list of FTT-liable instruments, typically **once per year** (e.g., France publishes at: https://bofip.impots.gouv.fr/bofip/9789-PGP.html/identifiant=BOI-ANNX-000467-20211229). Data vendors like SIX process these official lists and deliver updated eligibility data before the first applicable trading day.
+Each country publishes an official list of FTT-liable instruments, typically **once per year**. Data vendors like SIX process these official lists and deliver updated eligibility data before the first applicable trading day.
+
+**Official list sources:**
+
+| Country | Source | Criteria | Link |
+|---------|--------|----------|------|
+| Spain | Agencia Tributaria | Spanish companies with market cap > €1B as of Dec 1 of prior year (Royal Decree 366/2021) | Published annually |
+| France | BOI (Bulletin Officiel des Impôts) | French companies with market cap > €1B | https://bofip.impots.gouv.fr/bofip/9789-PGP.html/identifiant=BOI-ANNX-000467-20211229 |
+| Italy | Published by Italian authorities | Italian companies + derivatives | - |
+
+**Spain 2026 list example:** Lists ~65+ companies with columns for NIF (tax ID), company name, ISIN, market capitalisation value (as of 1/12/2025), and administration competent for the levy (AEAT or regional like Bizkaia, Navarra, Guipuzkoa). Includes companies like Inditex (ES0148396007, €153.6B), Banco Santander (ES0113900J37, €138.4B), Iberdrola (ES0144580Y14, €119.9B).
 
 ### Who pays FTT?
 
