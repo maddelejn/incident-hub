@@ -33,9 +33,16 @@ This is a structured knowledge base for incidents and support cases. When workin
 - `support-cases/` - One markdown file per support case, named `SC-XXX-short-description.md`
 - `TEMPLATE.md` - Template for new incidents. Always copy this when creating a new incident.
 - `SUPPORT-TEMPLATE.md` - Template for new support cases. Always copy this when creating a new support case.
-- `reference/` - Reference data (market IDs, MIC codes, team ownership, etc.). Consult these when triaging incidents.
+- `reference/` - Reference data (market IDs, MIC codes, vendor contacts, regulatory guides, etc.). Consult these when triaging or answering questions.
 - `runbooks/` - Step-by-step procedures for common operational tasks. Surface these when the user asks "how do I fix X?"
+- `products/` - Product documentation, feature descriptions, roadmaps, and domain knowledge for the user's PO areas and other product areas.
+- `teams/` - Team structures, ownership maps, who does what, goalie rotations, key people.
+- `processes/` - Business processes, workflows, regulatory processes (DORA, MiFID II, SFTR), internal procedures.
 - Both incidents and support cases use YAML frontmatter for structured metadata and markdown body for details.
+
+## Using this hub as a general knowledge base
+
+This hub is not limited to incidents. The user stores any knowledge they need to recall quickly: product details, team structures, architecture, processes, regulatory context, meeting notes, vendor agreements, etc. When the user asks a question, search ALL directories - the answer may come from a product doc, a reference file, an old incident, or a process description. Connect information across directories to give complete answers.
 
 ## Numbering
 
