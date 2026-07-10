@@ -9,6 +9,7 @@ This is a structured knowledge base for incidents and support cases. When workin
 - `TEMPLATE.md` - Template for new incidents. Always copy this when creating a new incident.
 - `SUPPORT-TEMPLATE.md` - Template for new support cases. Always copy this when creating a new support case.
 - `reference/` - Reference data (market IDs, MIC codes, team ownership, etc.). Consult these when triaging incidents.
+- `runbooks/` - Step-by-step procedures for common operational tasks. Surface these when the user asks "how do I fix X?"
 - Both incidents and support cases use YAML frontmatter for structured metadata and markdown body for details.
 
 ## Numbering
