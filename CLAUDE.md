@@ -90,3 +90,96 @@ This is a structured knowledge base for incidents and support cases. When workin
 - **one-off**: Asked once, unlikely to recur
 - **occasional**: Comes up every now and then
 - **frequent**: Recurring question, strong FAQ candidate
+
+## When the user pastes a raw Slack thread
+
+The user will paste raw Slack threads directly instead of pre-formatting them. When this happens:
+
+1. Extract: timeline, people involved, error messages, services affected, resolution steps, and links.
+2. Determine if it's an Incident (service disruption, customer impact) or Support Case (question, missing data, process issue).
+3. Cross-reference against existing incidents and support cases for patterns.
+4. Create the structured file with all extracted context.
+5. Always identify the responsible tech team, product owner, and escalation path.
+
+## Technical Architecture: Key Data Pipelines
+
+### Backdated Price Corrections (Abasec → NNX → Hodor)
+When data fixes need to go back in time:
+1. **Middle Office** updates the price in **Abasec** (source of truth for historical prices)
+2. **Team Marlin** publishes corrected price data from Abasec to **NNX**
+3. **Team Hodor** fetches from NNX to heal customer-facing graphs and balances
+
+This pipeline is used for: wrong valuation prices, fictitious instrument pricing, corporate action pricing errors.
+It is NOT used for: static metadata fixes (instrument names, regulatory data), on-prem core database fixes (those go via Coresys).
+
+### ETF/Fund Regulatory Data (Morningstar → fund-enrichment → Platform)
+```
+Morningstar (RegXchange / MDS feed)
+    ↓
+fund-enrichment / morningstar-fund-enrichment (Team Navigator)
+    ↓
+EnrichedFundTopic.V2 (Kafka topic)
+    ↓
+fund-bff → AboutETP component
+    ↓
+service-instrument aggregate endpoint (target_market, costs_and_charges)
+```
+
+### Morningstar Fund Reference Data (M* file → intake → instrument master)
+```
+Morningstar daily file (Basic Reference Data CSV)
+    ↓
+mstar-fund-overview-intake (Team Compass / Team Wolf)
+    ↓
+Instrument Master → Orderbooks → Search
+```
+**Known recurring failure:** M* file contains deletions → intake deletes instruments → orderbooks removed → orders fail. Three incidents (INC-006, INC-007, INC-008).
+
+### Instrument Name Corrections
+```
+Millistream (vendor correction) → Instrument Admin → Nordnet App & Web
+```
+
+## Key Services and Owners
+
+| Service | Owner | Purpose |
+|---------|-------|---------|
+| Abasec | Middle Office | Source of truth for historical prices and transactions |
+| NNX (Nordnet X) | - | Central data platform, receives price data from Abasec |
+| instrument-master | Team Wolf | Core instrument database |
+| instrument-admin | Team Wolf | Internal admin UI for instrument lookup |
+| admin-trading | - | Order history, validation, blocking/unblocking |
+| mstar-fund-overview-intake | Team Compass / Team Wolf | Morningstar fund reference data intake |
+| morningstar-fund-enrichment | Team Navigator | Morningstar ETF/fund enrichment (costs, target market, KID) |
+| fund-bff | Team Navigator | Fund backend-for-frontend |
+| daemon-intake-funds-morningstar1 | Team Navigator | Morningstar mutual fund EMT/MiFID data intake (on-prem) |
+| service-instrument | - | Instrument aggregate API (target_market, costs_and_charges) |
+| search | Team Compass | Instrument search (runs on schedule, needs market reload after fixes) |
+
+## Key Slack Channels for Escalation
+
+| Channel | Use For |
+|---------|---------|
+| #area-securities-brokerage | ETF regulatory data issues (KID/EMT), instrument intake issues. Ping @wolf-goalie |
+| #area-customer-journey | Instrument not showing in search after unblocking. Ping @compass-be |
+| #valuation-prices-on-nnx | Notify Team Marlin to publish corrected prices from Abasec to NNX |
+| #low-pressure | Active incident coordination |
+| #disco | Instrument visibility issues |
+
+## Key Internal Tools
+
+| Tool | URL | Purpose |
+|------|-----|---------|
+| Instrument Admin | https://instrument-admin.tools.prod.nntech.io/Instruments | Look up instruments, check intake rows, secondary identifiers |
+| Admin Trading | Order History → Validation tab | Check order rejection reason codes |
+| service-instrument aggregate | http://service-instrument.prod.nordnet.se/aggregate/instrument/isin_code/{ISIN}?expand=target_market | Verify target market / regulatory data |
+
+## Morningstar Identifier Patterns
+
+| Pattern | Type | Purpose |
+|---------|------|---------|
+| `F0000...` | Fund/Share Class ID | High-level fund umbrella identifier |
+| `0P000...` | SecID / Performance ID | Required by enrichment service for costs & charges |
+| `0C000...` | Management Company ID | Fund provider identification |
+
+When enrichment skips an instrument due to "missing secId or fundShareClassId", check the Secondary identifiers block in Instrument Admin for the `0P...` ID.
