@@ -15,6 +15,16 @@ Financial Transaction Tax is a tax levied on the purchase of certain financial i
 - **France (FFTT)** - Tax on purchases of shares in French companies with market cap > €1B
 - **Italy (IFTT)** - Tax on shares of Italian companies + derivatives
 - **Spain (SFTT)** - Tax on purchases of shares in Spanish companies with market cap > €1B
+- **Greece** - FTT on Greek equities
+
+### How FTT-relevant instruments are determined
+
+Each country publishes an official list of FTT-liable instruments, typically **once per year** (e.g., France publishes at: https://bofip.impots.gouv.fr/bofip/9789-PGP.html/identifiant=BOI-ANNX-000467-20211229). Data vendors like SIX process these official lists and deliver updated eligibility data before the first applicable trading day.
+
+### Who pays FTT?
+
+- **France, Spain, Italy:** The **custodian bank** must pay the FTT to the tax authorities. This means Nordnet (via its clearing chain) is responsible for calculating, collecting from the customer, and remitting.
+- **Greece:** **Clearstream automatically handles** FTT Greek and debits the tax directly to the banks on their Clearstream account. No manual process needed by Nordnet.
 
 When a Nordnet customer buys a financial instrument that's subject to FTT in any of these countries, Nordnet must calculate and collect the correct tax. This requires knowing, per instrument:
 - Is it FTT-relevant? (relevance flag)
@@ -103,12 +113,24 @@ More details: https://www.wmdatenservice.com/wp-content/uploads/2024/10/wmdatens
 | Edward Neptune | Involved |
 | Anders Furby | Involved |
 
+## Tradegate Context
+
+Lars Mattsson (Team Wolf) checked with Tradegate (Germany's largest OTC trading venue) in January 2026 about FTT data availability. Key findings from Thomas Gasinsky (Tradegate Service):
+
+- FTT data is **not included** in Tradegate's instrument list file
+- Tradegate confirmed FTT exists for France, Spain, Italy, and Greece
+- Tradegate's own regulatory reporting team provided the information but does not distribute FTT data as a data product
+
+**Implication:** FTT data must come from a dedicated data vendor (SIX or WM Daten), not from the trading venue itself.
+
+### Tradegate Contacts
+
+| Person | Role | Email |
+|--------|------|-------|
+| Thomas Gasinsky | Tradegate Service | tgasinsky@tradegate.de, +49 30 896 06-393 |
+| Maksym Borachok | Tradegate | mborachok@tradegate.de |
+| Support | General | support@tradegate.de |
+
 ## Impact on Vendor Decision
 
-This is significant new information for the SIX vs WM Daten comparison:
-
-**WM Daten has detailed FTT data covering France, Italy, and Spain** with 18 specific fields for tax classification, liability, exemption, and levy basis calculation. This is exactly what Team Match needs for cost and charges calculations when Nordnet customers trade instruments subject to foreign FTT.
-
-**Key question for SIX:** Do they provide equivalent FTT fields? If not, Nordnet may need WM Daten specifically for FTT regardless of the ETP/EMT decision.
-
-**Possible outcome:** Use SIX for EMT/KID/Target Market (better coverage, easier integration) + WM Daten for FTT tax data (authoritative source as German NNA). Or find that one vendor covers everything.
+**Updated (July 2026):** SIX has confirmed FTT data covering 13+ countries with clean CSV format, pricing at 150k SEK/year base. SIX is the recommended vendor - see reference/ftt-six-vs-wm-daten-comparison.md for full comparison.
