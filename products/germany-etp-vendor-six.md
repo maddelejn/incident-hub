@@ -54,33 +54,58 @@ SIX also covers other markets beyond Xetra for these instrument types. Relevant 
 **Main:** +46 8 5861 6300
 **Note:** Carl on vacation 4 weeks from July 7, reachable by phone for urgent matters.
 
-## SIX vs WM Daten Comparison
+## FTT Pricing (from Carl Sundman, May 5 2026)
 
-| Aspect | SIX | WM Daten |
-|--------|-----|----------|
-| **Coverage (Target Market)** | 100% (384/384) | 100% (confirmed by Funda) |
-| **Coverage (Costs & Charges)** | 100% (384/384) | 100% (confirmed by Funda) |
-| **Coverage (KIDs)** | 379/384 (5 missing, can be added) | TBD (need to verify from Excel) |
-| **Data format** | TBD | Proprietary WM Field Codes (requires mapping layer) |
-| **Ease of integration** | TBD | Difficult - legacy German field codes, no standard EMT format |
-| **FTT/Tax data** | TBD | Available (German tax flags for Abgeltungsteuer) |
-| **Multi-market coverage** | Yes (beyond Xetra) | TBD |
-| **Communication language** | Swedish (Stockholm office) | English/German |
-| **Existing Nordnet relationship** | Yes (already provides Partnership Shares data) | New vendor |
-| **Price** | TBD | Cheaper if buying subset of fields vs full product |
+| Tier | Instruments | Cost |
+|------|-------------|------|
+| Base | Up to 9,000 instruments | 150,000 SEK/year (minimum) |
+| 9,001 - 12,000 | Per instrument/year | 15.88 SEK |
+| 12,001 - 15,000 | Per instrument/year | 15.36 SEK |
+| 15,001 - 18,000 | Per instrument/year | 14.67 SEK |
+| 18,001 - 21,000 | Per instrument/year | 13.81 SEK |
+| 21,001 - 24,000 | Per instrument/year | 12.94 SEK |
+| 24,001 - 27,000 | Per instrument/year | 12.08 SEK |
+| 27,001 - 30,000 | Per instrument/year | 11.22 SEK |
+| 30,001 - 33,000 | Per instrument/year | 10.36 SEK |
+| 33,001 - 36,000 | Per instrument/year | 9.49 SEK |
+| 36,001 - 39,000 | Per instrument/year | 8.97 SEK |
+| 39,001+ | Per instrument/year | 8.63 SEK |
+
+**Calculation example:** 12,500 instruments = 150,000 + (3,000 × 15.88) + (500 × 15.36) = **205,320 SEK/year**
+
+**Note:** Instrument count is based on instruments in the output file that are FTT-relevant, not total universe.
+
+Delivery via **SIX Flex** (most cost-effective option).
+
+## FTT Technical Details (from Carl Sundman, April 30 2026)
+
+### Q&A with SIX
+
+| Question | SIX Answer |
+|----------|-----------|
+| **Coverage** | See factsheet - comprehensive multi-jurisdiction |
+| **Instrument identification** | Marked on ISIN level. For ES/FR/IT, official lists published yearly are processed by dedicated teams and delivered before first trading day |
+| **Tax rates provided?** | Yes - classifications and applicable FTT rates included |
+| **Tax currency** | Corresponds to the currency of the asset (instrument) |
+| **Netting rules** | Data indicates information is pertinent to "Transactions" |
+| **Alternative models (floor/ceiling, tiered)?** | No |
+| **Delivery methods** | SIX VDF, SIX Flex (file), SIX API, SIX Data Cloud (coming) |
+| **Delivery modes** | Bulk "push" (all FTT instruments) or request/reply (securities of interest) |
+
+### Nordnet contact for FTT pricing
+- **Peter Engman** (peter.engman@nordnet.se) - received pricing from Carl
 
 ## Open Questions for August Meeting
 
-- [ ] What data format does SIX deliver in? Standard EMT format or proprietary?
-- [ ] Does SIX provide FTT/tax data for German instruments (Abgeltungsteuer flags)?
-- [ ] What's the delivery mechanism (API, daily file, SFTP)?
-- [ ] Pricing comparison vs WM Daten
-- [ ] Can SIX deliver delta files (changes only) or full snapshots?
-- [ ] Update frequency (daily, real-time, on-change)?
-- [ ] Compare actual field-level data from both vendors' sample files
+- [ ] What data format does SIX deliver EMT/KID data in? Standard EMT format or proprietary?
+- [ ] Pricing for EMT/KID/Target Market data (separate from FTT pricing above)
+- [ ] Combined pricing if buying FTT + EMT/KID from same vendor?
+- [ ] Compare actual EMT field-level data from SIX vs WM Daten
 
 ## Related Documents
 
 - **products/germany-etp-vendor-wm-daten.md** - WM Daten as the alternative vendor
-- **reference/vendor-contacts.md** - SIX already listed as existing vendor (Partnership Shares)
-- **reference/emt-kid-priip-target-market-guide.md** - What the EMT/KID data actually contains
+- **products/germany-expansion-vendor-strategy.md** - Consolidated vendor strategy
+- **reference/ftt-six-vs-wm-daten-comparison.md** - Field-level FTT comparison
+- **reference/ftt-financial-transaction-tax.md** - WM Daten FTT fields
+- **reference/vendor-contacts.md** - SIX already listed as existing vendor
