@@ -54,7 +54,15 @@ last_updated: 2026-07-10
 | Internal contacts | Daniel, Johan |
 | Nordics support contact | Christel (from SC-002) |
 
-**Important (from SC-002):** Always create a **new ticket** when raising issues with Morningstar. Never reply to old/closed tickets, especially near holiday periods. Include the exact API call/payload and authenticating user email.
+**When raising a ticket with Morningstar, always include:**
+
+1. Always create a **new ticket** (never reply to old/closed ones, especially near holidays)
+2. Which **product** you are looking at
+3. Which **API call** you are making (exact endpoint/payload)
+4. The **authenticating user email**
+5. The affected **ISINs/fund identifiers**
+
+Morningstar has explicitly requested items 2-3 to speed up their troubleshooting for missing fund data.
 
 ### SIX
 
