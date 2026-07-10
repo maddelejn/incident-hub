@@ -2,7 +2,7 @@
 id: INC-008
 title: "Missing Fund Instruments due to Deleted Morningstar Reference Data"
 date: 2026-07-10
-detected_at: "2026-07-10"
+detected_at: "2026-07-10 08:06 CET"
 resolved_at: "2026-07-10"
 severity: P1
 status: resolved
@@ -12,7 +12,9 @@ product_owner: "Mutual Funds, Partner Web"
 category: integration
 root_cause_category: dependency-failure
 on_call_responder: ""
-tags: [morningstar, intake, funds, deletion, reference-data, orderbooks, search, partner-web, mstar-fund-overview-intake, recurring, vendor]
+tags: [morningstar, intake, funds, deletion, reference-data, orderbooks, search, partner-web, mstar-fund-overview-intake, recurring, vendor, opsgenie]
+opsgenie_alert: "#419500"
+alert_name: "Legacy_instruments_not_mapped_to_a_Nordnet_X_market_data_order_book"
 pr: "https://github.com/nordnet-private/mstar-fund-overview-intake/pull/191"
 ---
 
@@ -27,6 +29,7 @@ Morningstar explicitly deleted certain instruments from their daily delivery fil
 | Time | Event |
 |------|-------|
 | 2026-07-10 | Morningstar daily file delivered with instruments explicitly deleted |
+| 08:06 CET | Opsgenie P1 alert fired: `Legacy_instruments_not_mapped_to_a_Nordnet_X_market_data_order_book` - 13 legacy instruments not mapped to NNX market data order book. Routed to Team Wolf. (#419500) |
 | TBD | Fund orders started failing, instruments missing from search |
 | TBD | Investigation identified corrupted M* file as root cause |
 | TBD | Automated scheduler paused via PR (#191) |
