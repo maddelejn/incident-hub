@@ -8,7 +8,8 @@ This is a structured knowledge base for incidents and support cases. When workin
 - `support-cases/` - One markdown file per support case, named `SC-XXX-short-description.md`
 - `TEMPLATE.md` - Template for new incidents. Always copy this when creating a new incident.
 - `SUPPORT-TEMPLATE.md` - Template for new support cases. Always copy this when creating a new support case.
-- Both use YAML frontmatter for structured metadata and markdown body for details.
+- `reference/` - Reference data (market IDs, MIC codes, team ownership, etc.). Consult these when triaging incidents.
+- Both incidents and support cases use YAML frontmatter for structured metadata and markdown body for details.
 
 ## Numbering
 
