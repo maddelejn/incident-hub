@@ -85,24 +85,26 @@ Timeline for this instrument:
 | Fix execution | Coresys | DB update to migrate orders |
 | PO / Context | Madde | WI ticker change context, confirmed SKHY is correct |
 
-## Open Questions
+## The Right Approach: Automated Order Migration
 
-- [ ] Should Nordnet offer When-Issued instruments at all? This is the first time this issue has surfaced.
-- [ ] If we continue offering WI instruments, what automated process should handle the ticker transition for open orders?
-- [ ] Should there be a pre-market check on ticker change days that identifies and migrates or cancels orphaned orders?
+**If we offer WI instruments, we must handle the full order lifecycle.** Cancelling customer orders because of an internal system gap is not acceptable - it's pushing our problem onto the customer. If we can't support it properly, we shouldn't offer it.
+
+The correct solution: **automated order migration when the ticker changes from WI to regular-way.** The instrument is the same, the ISIN is the same - only the ticker symbol changes. Open orders should seamlessly carry over to the new ticker without the customer noticing.
+
+Millistream already delivers the ticker change. The order management system needs to react to that event by migrating all open orders from the old ticker to the new one.
 
 ## Action Items
 
 | Action | Owner | Status | Due Date |
 |--------|-------|--------|----------|
-| Coresys to update stuck SKHYV orders in DB | Coresys | In progress | ASAP |
-| Investigate automated handling for WI → regular-way ticker transitions | Team Wolf / Madde | Open | TBD |
-| Evaluate whether to offer When-Issued instruments or block them | Madde / Trading Desk | Open | TBD |
-| Add When-Issued ticker change to US instrument listing runbook | Madde | Open | TBD |
+| Coresys to migrate stuck SKHYV orders to SKHY in DB | Coresys / Sebbe | In progress | ASAP |
+| Build automated order migration for ticker changes (WI and general) | Team Wolf / Madde | Open | TBD |
+| Update US instrument listing runbook with WI handling | Madde | Open | TBD |
 
 ## Lessons Learned
 
-- **When-Issued instruments are a new edge case.** Nordnet's instrument intake and order management don't have a specific flow for WI → regular-way transitions. This needs to be either automated or WI instruments need to be blocked.
+- **If you let customers place orders, you own the lifecycle.** Cancelling orders because of an internal gap is unacceptable. Either support WI instruments fully (with automated order migration) or don't offer them at all.
+- **This isn't just a WI problem.** Any ticker change (corporate action name changes, mergers) could orphan open orders the same way. Automated order migration on ticker changes is the systemic fix.
 - **The Millistream intake worked fine** - it delivered the instrument under both tickers. The gap is in order management, not instrument intake.
 - **Account refresh as a workaround** - refreshing the account allowed individual order deletion, but this doesn't scale for bulk operations.
 
@@ -110,15 +112,14 @@ Timeline for this instrument:
 
 - **Runbook: New Listing in US Instruments** (runbooks/new-listing-us-instruments.md) - The SKHYV instrument was unblocked through the standard US instrument process. The runbook should be updated to flag When-Issued instruments as requiring special handling.
 - **INC-001** (Stuck Instrument Blocking Order Routing) - Similar pattern of an instrument state change causing downstream order problems, though different root cause.
+- **Runbook: Correcting Instrument Names** (runbooks/correcting-instrument-names.md) - Ticker/name changes via Millistream. Same underlying event (ticker change) but this incident shows the order management side isn't handling it.
 
-## Runbook: When-Issued Ticker Changes (New)
+## Runbook: When-Issued Ticker Changes (Interim Manual Process)
 
-If this happens again:
+Until automated order migration is built, if this happens again:
 
 1. **Identify** all open orders under the old WI ticker (with V suffix)
-2. **Decide** per order type:
-   - Market/Limit orders: Update to new ticker in DB (Coresys) or cancel and notify customer
-   - Stop/Stop-Limit/Trailing orders: Likely need cancellation since price levels may not be valid
-3. **Account refresh** can unblock individual order deletions as a workaround
+2. **Migrate ALL orders** to the new ticker via Coresys DB update - do NOT cancel customer orders
+3. **Account refresh** can unblock individual order deletions as a temporary workaround
 4. **Inform Trading Desk** so they can handle customer inquiries
 5. **Verify** search and graph flows work under the new ticker
