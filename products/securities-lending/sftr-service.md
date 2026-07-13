@@ -4,7 +4,7 @@ title: "Service-SFTR - Securities Financing Transactions Regulation Reporting"
 status: active
 source: "https://nordnetbank.atlassian.net/wiki/spaces/DE/pages/80810260"
 owning_team: "Team Shark (Domain Execution)"
-system_owner: "Björn Alenvik"
+system_owner: "Madelene Söderström"
 product_owner: "Madelene Söderström"
 platform: "on-prem"
 database: "Oracle (ORAP)"
