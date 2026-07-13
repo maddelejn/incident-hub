@@ -85,27 +85,48 @@ Timeline for this instrument:
 | Fix execution | Coresys | DB update to migrate orders |
 | PO / Context | Madde | WI ticker change context, confirmed SKHY is correct |
 
-## The Right Approach: Automated Order Migration
+## Critical Finding: Orders on SKHYV Do NOT Reserve Cash
 
-**If we offer WI instruments, we must handle the full order lifecycle.** Cancelling customer orders because of an internal system gap is not acceptable - it's pushing our problem onto the customer. If we can't support it properly, we shouldn't offer it.
+Simon Ljungberg discovered that **buy orders placed on SKHYV are not reserving cash** (trading power). This creates a double-execution risk:
 
-The correct solution: **automated order migration when the ticker changes from WI to regular-way.** The instrument is the same, the ISIN is the same - only the ticker symbol changes. Open orders should seamlessly carry over to the new ticker without the customer noticing.
+```
+Scenario:
+  1. Customer places buy order on SKHYV (Friday) - no cash reserved
+  2. Customer places buy order on SKHY (Monday) - thinking old order is dead
+  3. If we migrate SKHYV orders to SKHY → BOTH execute
+  4. Customer is overdrawn
+```
 
-Millistream already delivers the ticker change. The order management system needs to react to that event by migrating all open orders from the old ticker to the new one.
+This means **blindly migrating orders is dangerous.** It's not just a ticker mapping issue - it's a trading power / cash reservation gap that creates financial exposure.
+
+## Decision Needed
+
+| Option | Risk | Customer Impact |
+|--------|------|-----------------|
+| **Cancel SKHYV orders + notify customers** | Low financial risk | Customers who haven't re-ordered on SKHY miss their trade. Acceptable if communicated properly and promptly. |
+| **Migrate SKHYV orders to SKHY** | High - double execution risk if customer already re-ordered on SKHY | Seamless for customers who didn't re-order, dangerous for those who did |
+| **Migrate only if customer has no existing SKHY order** | Medium - requires per-customer check | Best of both worlds but operationally complex for a manual DB fix |
+
+**For this incident:** Given the cash reservation gap and the double-execution risk, cancelling with customer notification is the safer choice. However, this highlights that **if Nordnet offers WI instruments, the system must properly handle the full lifecycle** - including cash reservation on WI orders and automated migration on ticker change. Without that, offering WI instruments creates a known gap.
+
+**Post-vacation action (Björn Alenvik):** Evaluate whether to offer When-Issued instruments at all, or invest in proper WI lifecycle handling (cash reservation + automated ticker migration).
 
 ## Action Items
 
 | Action | Owner | Status | Due Date |
 |--------|-------|--------|----------|
-| Coresys to migrate stuck SKHYV orders to SKHY in DB | Coresys / Sebbe | In progress | ASAP |
-| Build automated order migration for ticker changes (WI and general) | Team Wolf / Madde | Open | TBD |
+| Decide: cancel or migrate stuck SKHYV orders (considering double-execution risk) | Madde / Trading Desk / Sebbe | In progress | ASAP |
+| If cancelling: notify affected customers | Trading Desk / Customer Service | Pending decision | ASAP |
+| Post-vacation: evaluate WI instrument offering and proper lifecycle handling | Björn Alenvik / Madde | Open | August |
+| Investigate why WI orders don't reserve cash (trading power) | Team Wolf | Open | TBD |
 | Update US instrument listing runbook with WI handling | Madde | Open | TBD |
 
 ## Lessons Learned
 
-- **If you let customers place orders, you own the lifecycle.** Cancelling orders because of an internal gap is unacceptable. Either support WI instruments fully (with automated order migration) or don't offer them at all.
-- **This isn't just a WI problem.** Any ticker change (corporate action name changes, mergers) could orphan open orders the same way. Automated order migration on ticker changes is the systemic fix.
-- **The Millistream intake worked fine** - it delivered the instrument under both tickers. The gap is in order management, not instrument intake.
+- **The real problem is deeper than ticker mapping.** Orders on the WI ticker don't reserve cash. Even if the ticker migration worked perfectly, this cash reservation gap would still create risk.
+- **Normal ticker changes work fine.** The system handles regular corporate action ticker changes correctly. WI instruments break because something in the order/instrument setup treats them differently (likely the V-suffix instrument doesn't have proper trading power integration).
+- **Same ISIN, same instrument ID.** Confirmed that SKHYV and SKHY share the same ISIN - only short name and symbol changed. The system should have handled this like any other ticker change, but didn't.
+- **The Millistream intake worked fine** - it delivered the instrument under both tickers. The gap is in order management and cash reservation, not instrument intake.
 - **Account refresh as a workaround** - refreshing the account allowed individual order deletion, but this doesn't scale for bulk operations.
 
 ## Related Cases
@@ -116,10 +137,13 @@ Millistream already delivers the ticker change. The order management system need
 
 ## Runbook: When-Issued Ticker Changes (Interim Manual Process)
 
-Until automated order migration is built, if this happens again:
+Until proper WI lifecycle handling is built, if this happens again:
 
 1. **Identify** all open orders under the old WI ticker (with V suffix)
-2. **Migrate ALL orders** to the new ticker via Coresys DB update - do NOT cancel customer orders
-3. **Account refresh** can unblock individual order deletions as a temporary workaround
-4. **Inform Trading Desk** so they can handle customer inquiries
-5. **Verify** search and graph flows work under the new ticker
+2. **Check for double-execution risk:** For each customer with a WI order, check if they also have an order on the new ticker
+3. **If customer has orders on BOTH tickers:** Cancel the WI order and notify the customer
+4. **If customer only has the WI order:** Migrate to new ticker via Coresys DB update (preferred) or cancel and notify
+5. **Verify** that WI orders are actually reserving cash - if not, DO NOT blindly migrate (overdraft risk)
+6. **Account refresh** can unblock individual order deletions as a temporary workaround
+7. **Inform Trading Desk** so they can handle customer inquiries
+8. **Verify** search and graph flows work under the new ticker
