@@ -54,11 +54,25 @@ SK Hynix Inc listed on Nasdaq with a When-Issued ticker `SKHYV` (trading July 10
 2. Nordnet's system updated the instrument to the new ticker (SKHY) but did not migrate existing open orders from the old ticker (SKHYV)
 3. Orders under the old ticker became orphaned - the instrument `SKHYV` no longer exists in the system, so orders can't be found, executed, or deleted
 
-## Resolution (In Progress)
+## Resolution
 
-1. **Immediate:** Sebbe found that after account refresh, individual order deletion works
-2. **Bulk fix:** Coresys to update remaining stuck orders in the database to point to SKHY
-3. **6 stop-limit/stop-trailing orders:** Need decision - update to SKHY or delete entirely (since they would never reach the market under old ticker)
+**Decision: Mass-cancel all 87 SKHYV orders. Do NOT route to SKHY.**
+
+Rerouting is unsafe because:
+1. **No cash reserved** on the old orders - executing them causes unauthorized overdrafts
+2. **Double execution risk** - customers who already re-ordered on SKHY would buy twice
+3. **Stop-order cascade risk** - forcing a ticker change on 6 stop-limit/trailing orders without validation could trigger accidental market-sell cascades at US market open
+
+**Steps:**
+1. Cancel all 87 orders on SKHYV
+2. Notify affected customers (SMS/Email) to re-place orders under SKHY if they still want to trade
+3. Sebbe confirmed account refresh enables individual deletion as fallback
+
+### Why This Doesn't Happen on Regular Ticker Changes
+
+On a standard corporate name change (e.g., Facebook → Meta), the instrument's **internal unique ID stays the same** - only the text string updates. The system handles this natively.
+
+SKHYV was set up as a **completely separate, temporary WI asset entity**. When SKHY was introduced, it became a **new entity**. The old entity's orders broke because they reference an instrument that's been superseded, not renamed. This is fundamentally different from a ticker change - it's an instrument replacement.
 
 ## What is When-Issued Trading?
 
@@ -99,17 +113,16 @@ Scenario:
 
 This means **blindly migrating orders is dangerous.** It's not just a ticker mapping issue - it's a trading power / cash reservation gap that creates financial exposure.
 
-## Decision Needed
+## Post-Vacation Decision Needed
 
-| Option | Risk | Customer Impact |
-|--------|------|-----------------|
-| **Cancel SKHYV orders + notify customers** | Low financial risk | Customers who haven't re-ordered on SKHY miss their trade. Acceptable if communicated properly and promptly. |
-| **Migrate SKHYV orders to SKHY** | High - double execution risk if customer already re-ordered on SKHY | Seamless for customers who didn't re-order, dangerous for those who did |
-| **Migrate only if customer has no existing SKHY order** | Medium - requires per-customer check | Best of both worlds but operationally complex for a manual DB fix |
+**Discuss with Björn Alenvik in August:** Should Nordnet offer When-Issued instruments at all?
 
-**For this incident:** Given the cash reservation gap and the double-execution risk, cancelling with customer notification is the safer choice. However, this highlights that **if Nordnet offers WI instruments, the system must properly handle the full lifecycle** - including cash reservation on WI orders and automated migration on ticker change. Without that, offering WI instruments creates a known gap.
+If yes, the system must handle:
+1. **Cash reservation on WI orders** (currently broken - orders don't reserve trading power)
+2. **Instrument entity transition** from WI to regular-way (not a simple ticker rename - it's a separate instrument entity)
+3. **Order migration or cancellation** with customer notification
 
-**Post-vacation action (Björn Alenvik):** Evaluate whether to offer When-Issued instruments at all, or invest in proper WI lifecycle handling (cash reservation + automated ticker migration).
+If the investment to fix all three isn't justified by the WI trading revenue, then block WI instruments in the intake entirely.
 
 ## Action Items
 
@@ -139,11 +152,11 @@ This means **blindly migrating orders is dangerous.** It's not just a ticker map
 
 Until proper WI lifecycle handling is built, if this happens again:
 
-1. **Identify** all open orders under the old WI ticker (with V suffix)
-2. **Check for double-execution risk:** For each customer with a WI order, check if they also have an order on the new ticker
-3. **If customer has orders on BOTH tickers:** Cancel the WI order and notify the customer
-4. **If customer only has the WI order:** Migrate to new ticker via Coresys DB update (preferred) or cancel and notify
-5. **Verify** that WI orders are actually reserving cash - if not, DO NOT blindly migrate (overdraft risk)
-6. **Account refresh** can unblock individual order deletions as a temporary workaround
-7. **Inform Trading Desk** so they can handle customer inquiries
-8. **Verify** search and graph flows work under the new ticker
+1. **Do NOT reroute/migrate orders** - WI orders don't reserve cash, migrating risks double execution and overdrafts
+2. **Mass-cancel all orders** under the old WI ticker
+3. **Notify affected customers** (SMS/Email) to re-place orders under the new regular-way ticker if they still want to trade
+4. **Account refresh** can unblock individual order deletions if mass-cancel has issues
+5. **Inform Trading Desk** so they can handle customer inquiries
+6. **Verify** search, graph, and trading flows work under the new ticker
+
+**Key insight:** WI instruments are set up as separate instrument entities, not a ticker rename. This is why regular ticker changes work fine but WI transitions break. The old WI entity becomes invalid, orphaning any orders on it.
