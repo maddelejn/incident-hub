@@ -75,6 +75,56 @@ The customer can sell via the **Trading Desk** (manual broker intervention). Bec
 2. **Should orphaned XETB positions be remapped?** For non-German customers, mapping to Vienna (XVIE) instead of Tradegate would restore electronic trading access - but it's unclear if Vienna is a supported trading venue on the platform.
 3. **How did the customer find the Tradegate instrument page?** In this specific case the position wasn't mapped to Tradegate on the back-end. Need to understand if customers are finding it via search or if the UI is showing it incorrectly.
 
+## Tradegate UI Behavior (Search, Instrument Page, Positions)
+
+Understanding how Tradegate instruments appear in the UI is important for diagnosing customer confusion.
+
+### Search behavior
+
+The search has two modes:
+
+| Mode | Behavior | Example (TRATON SE) |
+|------|----------|---------------------|
+| **Preferred tradable(s)** | Shows one result per instrument. Xetra is preferred over Tradegate. Tradegate is hidden when Xetra exists. | Shows "TRATON SE" in SEK and one EUR result (Xetra) |
+| **All tradable(s)** | Shows all venues separately with venue labels | Shows "8TRA - Xetra" EUR and "8TRA - Tradegate" EUR as separate rows |
+
+For non-German customers, Tradegate instruments should not appear in search at all (search = false in operation rules).
+
+### Instrument page and order dialog
+
+- German customers see a **venue selector dropdown** on the instrument page showing available venues (e.g. "Xetra" with checkmark, "Tradegate")
+- The **Order Dialog** has a "Trade venue" selector where the customer can pick Xetra or Tradegate before placing the order
+- Xetra is the default/preferred venue when both are available
+
+### Position page (fungible vs non-fungible display)
+
+| Display mode | Behavior | What the customer sees |
+|-------------|----------|----------------------|
+| **Fungible** | One position row regardless of venue | "TRATON SE" EUR with Buy/Sell buttons. Customer picks venue at trade time. |
+| **Non-fungible** | Separate rows per venue | "TRATON SE - Xetra" EUR and "TRATON SE - Tradegate" EUR, each with own Buy/Sell |
+
+For fungible instruments (which is the normal Xetra/Tradegate case), the customer sees a single position and chooses the venue when they trade. This is consistent with the `tradableMappings` model in the instrument-id-mapper.
+
+## NPAP Change Record
+
+Tradegate was formally approved through NPAP **Change 362: Trading: Tradegate BSX**.
+
+| Field | Detail |
+|-------|--------|
+| Change Business Owner | Quincy Curry (Director of Securities Brokerage) |
+| Change Initiative Owner | Björn Alenvik (Area Product Owner, Securities Brokerage) |
+| Target timeline | H1 2026 (June) |
+| Scope | German customers only, equity instruments only |
+| Exchange membership | Nordnet as Direct Member of Tradegate BSX |
+| Order routing | Via Virtu (service bureau under Nordnet's membership) |
+| Settlement | Tradegate → Clearstream → Citi (account operator) |
+| Order types | Limit Orders initially. Market Orders planned for later stage. |
+| Applicable regulations | MiFID II/MiFIR, BörsG (German Stock Exchange Act), MAR, CSDR, EU PFOF Ban |
+| FTT impact | French (0.40%), Italian (0.20%), Spanish (0.20%) FTT applies based on issuer jurisdiction - but Nordnet does not plan to offer those shares on Tradegate |
+| Reporting | TRS and ORK reporting required. ORK short-code mapping routed via Virtu. |
+| Key vendors | Tradegate BSX, Virtu, Citi, Clearstream, Millistream, Morningstar, ICE, Deutsche Börse Group |
+| Confluence | https://nordnetbank.atlassian.net/wiki/spaces/RC/pages/1611759680 |
+
 ## Tradegate Technical Details (Market ID 85)
 
 For reference, Tradegate is being rolled out as part of the Germany expansion:
