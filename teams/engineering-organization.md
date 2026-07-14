@@ -35,7 +35,7 @@ Customer-facing experience and engagement teams.
 | **Cats** | Social Investment Experience | |
 | **Sparkles** | Customer Facing AI | |
 | **Compass** | Inspire, watchlists, news | Owns search - escalate instrument visibility issues here |
-| **Activation** | Get me started | |
+| **Activation** | Get me started | Owns suitability/knowledge tests (MiFID II) |
 | **Firefly** | Your Nordnet Life in the Mobile App | |
 | **Ping** | Customer communications | ICC-related, customer messaging during incidents |
 | **Falcon** | Portfolio and Analytics | Portfolio views, returns graphs |
