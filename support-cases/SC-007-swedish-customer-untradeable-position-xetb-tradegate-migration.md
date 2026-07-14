@@ -29,9 +29,16 @@ Rasmus Nilsson (Customer Service) reported that Swedish customers are unable to 
 3. **Post-deletion:** The customer's position became associated with the Tradegate instrument (AGB2), since Tradegate is the most active German retail venue still trading this ISIN.
 4. **Now:** The customer cannot sell electronically because Tradegate (Market ID 85) is restricted to German customers only.
 
-### Key finding
+### Confirmed finding
 
-On investigation, the customer's position in this specific case had **not** actually been mapped to the Tradegate instrument on the back-end - it still sat on the old Xetra one. The question back to Rasmus was: how did the customer find/view the Tradegate instrument page if it's not mapped?
+The customer's position **is** linked to the Tradegate instrument (Abasec insid **469388**). This was confirmed by Lars Mattsson.
+
+**What the customer sees:**
+- German flag on the position in account overview
+- Greyed out Buy/Sell buttons (because Tradegate is German-only)
+- Real-time pricing from Tradegate (15 min delayed) - previously the position likely had once-a-day pricing or no live price when it was on the deleted Xetra instrument
+
+The price change from once-a-day to real-time Tradegate pricing may itself be a source of customer confusion (Lars Mattsson's observation).
 
 ## Why This Happens
 
@@ -80,21 +87,27 @@ This requires:
 
 ### Why the customer can't sell electronically
 
-The customer is blocked on all available electronic venues:
+The customer's position is linked to the Tradegate instrument (insid 469388). The account overview shows a German flag with greyed out Buy/Sell buttons.
 
 | Venue | Status | Why they can't sell |
 |-------|--------|-------------------|
-| Xetra (XETB) | Deleted Sept 2025 | Instrument no longer exists in the system |
-| Tradegate | Active | German customers only |
+| Tradegate (position is here) | Active | German customers only - buy/sell greyed out |
+| Xetra (XETB) | Deleted Sept 2025 | Instrument no longer exists |
 | Vienna (XVIE) | Active, primary listing | Position not linked to Vienna instrument |
 
-Vienna is available for electronic trading on Nordnet, but the customer's position is still tied to the deleted Xetra instrument, not the Vienna one. If remapped to Vienna, the customer could sell online.
+Vienna is available for electronic trading on Nordnet. If the position were remapped to a Vienna instrument, the customer could sell online.
+
+### Customer communication guidance
+
+**From Pierre (Product):** To Swedish customers, only say that **this instrument is not currently offered to be traded electronically via Nordnet.** Do NOT mention Tradegate, regional German exchanges, or the venue migration. Keep it simple.
+
+**For selling:** The Trading Desk (confirmed by Simon Ljungberg) can sell on regional German exchanges (Frankfurt floor, Munich, Stuttgart, etc.) or Vienna.
 
 ### Open questions
-1. **How widespread is this?** Are there more Swedish/Nordic customers holding positions in instruments that moved from XETB to Tradegate after the September 2025 cleanup?
-2. **Does a Vienna instrument exist for AT000AGRANA3?** If so, remapping the position would immediately restore electronic trading for this customer.
-3. **Should orphaned XETB positions be systematically remapped?** For non-German customers, positions on deleted XETB instruments should be checked against other supported markets (Vienna, Milan, Paris, etc.) and remapped where possible.
-4. **How did the customer find the Tradegate instrument page?** In this specific case the position wasn't mapped to Tradegate on the back-end. Need to understand if customers are finding it via search or if the UI is showing it incorrectly.
+1. **How widespread is this?** Are there more Nordic customers holding positions that got mapped to Tradegate after the September 2025 XETB cleanup?
+2. **Should Nordic customers' positions be remapped away from Tradegate?** For non-German customers, positions on Tradegate instruments should ideally point to a venue they can actually trade on (e.g. Vienna). Need to find a logic for this.
+3. **Does a Vienna instrument exist for AT000AGRANA3?** If so, remapping would immediately restore electronic trading.
+4. **Pricing confusion:** Lars noted that positions mapped to Tradegate now show real-time (15 min delayed) Tradegate prices, whereas before they may have had once-a-day or no live pricing. This change in price behavior (plus the German flag appearing) is likely what triggers customer calls.
 
 ## Nordnet Supported Electronic Trading Markets
 
@@ -297,9 +310,11 @@ When both Xetra and Tradegate are available, Xetra is preferred. The operation r
 
 | Role | Person/Team | Action |
 |------|-------------|--------|
-| Reporter | Rasmus Nilsson (Customer Service) | Reported customer unable to sell |
-| Escalation | Lars Mattsson (Team Wolf) | Confirmed Tradegate not live, suggested broker workaround |
-| Investigation | Madde (Team Wolf PO) | Investigated back-end mapping, confirmed position not mapped to Tradegate |
+| Reporter | Rasmus Nilsson (Customer Service) | Reported customer unable to sell, identified instrument in instrument admin |
+| Investigation | Lars Mattsson (Team Wolf) | Identified position on Tradegate insid 469388, noted pricing change impact |
+| Investigation | Madde (Team Wolf PO) | Investigated XETB deletion history, back-end instrument mapping |
+| Trading Desk | Simon Ljungberg | Confirmed Trading Desk can sell on regional German exchanges |
+| Product guidance | Pierre | Customer communication guidance: don't mention Tradegate/regional exchanges to Swedish customers |
 
 ## Related
 
