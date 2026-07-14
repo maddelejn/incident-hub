@@ -1,7 +1,7 @@
 ---
 type: reference
 title: "Market Reference Data - MIC Codes, Market IDs, and Types"
-last_updated: 2026-07-10
+last_updated: 2026-07-14
 ---
 
 # Market Reference Data
@@ -53,6 +53,17 @@ MIC (Market Identifier Codes) follow ISO standards. Market IDs are internal Nord
 | # | Name | MIC | Market ID | Trading | Legal Type | Financial Type |
 |---|------|-----|-----------|---------|------------|----------------|
 | 22 | Xetra | XETR | 4 | Electronic | RM/OTF | Capital market, Derivatives market |
+| 34 | Tradegate Exchange | XGAT/XGRM | 85 | Electronic | RM | Capital market |
+
+### Tradegate / Xetra Fungibility
+
+Tradegate and Xetra instruments sharing the same ISIN are **fungible** - they represent the exact same position at the clearing house. A customer can buy on one venue and sell on the other without a position transfer. This is different from dual-listing (e.g. INC-003), where separate instrument lines exist per market.
+
+The system models this via `tradableMappings` in the instrument-id-mapper, where a single instrument has order book entries for both Market ID 4 (Xetra) and Market ID 85 (Tradegate).
+
+**Access restriction:** Tradegate is restricted to **German customers only**. Non-German customers cannot buy, sell, or search Tradegate instruments. When both Xetra and Tradegate are available, Xetra is the preferred venue (Tradegate hidden from search).
+
+**Known issue:** When instruments are delisted from Xetra Freiverkehr (XETB) but remain active on Tradegate, non-German customers holding old Xetra positions may lose electronic trading access. See SC-007.
 
 ## USA
 
@@ -124,6 +135,7 @@ MIC (Market Identifier Codes) follow ISO standards. Market IDs are internal Nord
 | 75 | Euronext Brussels |
 | 76 | Euronext Dublin |
 | 78 | Funds |
+| 85 | Tradegate Exchange |
 
 ## Incident-Relevant Market IDs
 
