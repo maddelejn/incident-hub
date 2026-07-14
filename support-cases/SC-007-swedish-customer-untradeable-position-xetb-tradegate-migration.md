@@ -75,15 +75,17 @@ When an instrument migrates from Xetra to Tradegate (due to XETB cleanup), non-G
 ## Resolution
 
 ### Immediate workaround
-The customer can sell via the **Trading Desk** (manual broker intervention). Because the shares are fungible, a broker can execute a sell order on the Vienna Stock Exchange (XVIE) where the primary listing is active and liquid.
+The customer can sell via the **Trading Desk** (manual broker intervention). The Trading Desk (confirmed by Simon Ljungberg) can sell on regional German exchanges (Frankfurt floor, Munich, Stuttgart, etc.) or Vienna.
 
-### Potential permanent fix
-**Vienna Stock Exchange is available for electronic self-service trading on Nordnet.** This means if the customer's position were remapped from the deleted Xetra instrument to the corresponding Vienna instrument (AT000AGRANA3 / AGRv on XVIE), the customer should be able to sell electronically without needing the Trading Desk.
+### Correct fix: treat as OTC, NOT remap to Vienna
 
-This requires:
-1. Confirming that a Vienna instrument for ISIN AT000AGRANA3 exists in the instrument database
-2. Remapping the customer's position from the deleted XETB instrument to the Vienna one
-3. Evaluating whether this should be done systematically for all orphaned XETB positions where a Vienna (or other supported market) instrument exists
+**Vienna remapping is NOT the solution.** Although Nordnet offers electronic trading on Vienna Stock Exchange, Vienna and Xetra/Tradegate are **not treated as fungible at Nordnet**. Nordnet clears Vienna via the custody partner **Citi**, not directly via **Clearstream**. Remapping positions from Tradegate to Vienna would create clearing and settlement mismatches.
+
+The correct approach is that deleted Xetra instruments that end up on Tradegate should be **treated as OTC instruments** for non-German customers. This would:
+- Remove the confusing German flag from the account overview
+- Remove the real-time Tradegate pricing (which confuses customers)
+- Correctly signal to customers that they need to call the Trading Desk to sell
+- Avoid clearing/settlement issues that would arise from remapping to Vienna
 
 ### Why the customer can't sell electronically
 
@@ -93,21 +95,18 @@ The customer's position is linked to the Tradegate instrument (insid 469388). Th
 |-------|--------|-------------------|
 | Tradegate (position is here) | Active | German customers only - buy/sell greyed out |
 | Xetra (XETB) | Deleted Sept 2025 | Instrument no longer exists |
-| Vienna (XVIE) | Active, primary listing | Position not linked to Vienna instrument |
-
-Vienna is available for electronic trading on Nordnet. If the position were remapped to a Vienna instrument, the customer could sell online.
+| Vienna (XVIE) | Active, primary listing | Not fungible at Nordnet (different clearing path via Citi) |
 
 ### Customer communication guidance
 
 **From Pierre (Product):** To Swedish customers, only say that **this instrument is not currently offered to be traded electronically via Nordnet.** Do NOT mention Tradegate, regional German exchanges, or the venue migration. Keep it simple.
 
-**For selling:** The Trading Desk (confirmed by Simon Ljungberg) can sell on regional German exchanges (Frankfurt floor, Munich, Stuttgart, etc.) or Vienna.
+**For selling:** Customer calls Trading Desk, who can execute a manual sell order.
 
-### Open questions
-1. **How widespread is this?** Are there more Nordic customers holding positions that got mapped to Tradegate after the September 2025 XETB cleanup?
-2. **Should Nordic customers' positions be remapped away from Tradegate?** For non-German customers, positions on Tradegate instruments should ideally point to a venue they can actually trade on (e.g. Vienna). Need to find a logic for this.
-3. **Does a Vienna instrument exist for AT000AGRANA3?** If so, remapping would immediately restore electronic trading.
-4. **Pricing confusion:** Lars noted that positions mapped to Tradegate now show real-time (15 min delayed) Tradegate prices, whereas before they may have had once-a-day or no live pricing. This change in price behavior (plus the German flag appearing) is likely what triggers customer calls.
+### Open questions / next steps
+1. **Scope the problem (Pierre's request):** How many instruments (custodyInstrumentIds) do non-DE customers own that only have trading orderbooks on Tradegate? This quantifies how big the problem is.
+2. **Backend logic fix:** Need to implement logic so that when a German venue cleanup happens, Nordic customers' legacy positions are treated as OTC instead of being mapped to Tradegate. This would remove the German flag and greyed-out buttons.
+3. **Pricing confusion:** Lars noted that positions mapped to Tradegate now show real-time (15 min delayed) Tradegate prices, whereas before they likely had once-a-day or no live pricing. This change in price behavior (plus the German flag appearing) is what triggers customer calls. Treating as OTC would resolve this.
 
 ## Nordnet Supported Electronic Trading Markets
 
