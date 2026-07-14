@@ -103,10 +103,20 @@ The customer's position is linked to the Tradegate instrument (insid 469388). Th
 
 **For selling:** Customer calls Trading Desk, who can execute a manual sell order.
 
-### Open questions / next steps
-1. **Scope the problem (Pierre's request):** How many instruments (custodyInstrumentIds) do non-DE customers own that only have trading orderbooks on Tradegate? This quantifies how big the problem is.
-2. **Backend logic fix:** Need to implement logic so that when a German venue cleanup happens, Nordic customers' legacy positions are treated as OTC instead of being mapped to Tradegate. This would remove the German flag and greyed-out buttons.
-3. **Pricing confusion:** Lars noted that positions mapped to Tradegate now show real-time (15 min delayed) Tradegate prices, whereas before they likely had once-a-day or no live pricing. This change in price behavior (plus the German flag appearing) is what triggers customer calls. Treating as OTC would resolve this.
+### Action items
+
+| # | Action | Owner | Status | Details |
+|---|--------|-------|--------|---------|
+| 1 | **Scope the problem** | Pierre / Madde | Open | Identify how many non-DE customers hold positions where the only trading orderbook is on Tradegate (custodyInstrumentIds). This determines urgency - is it 5 customers or 500? |
+| 2 | **Define the technical fix** | Team Wolf (Madde / Lars) | Open | What does "treat as OTC" mean technically? Is it a change in instrument-id-mapper, operation rules, or the instrument intake pipeline? Needs to remove: German flag, Tradegate real-time pricing, greyed-out buy/sell buttons. Should show as OTC with once-a-day pricing (or no live price). |
+| 3 | **Build ongoing prevention logic** | Team Wolf | Open | Xetra Freiverkehr (XETB) cleanups will keep happening. The fix must not be a one-time cleanup but an automated logic that catches future XETB deletions and prevents non-DE customer positions from landing on Tradegate. Should trigger when Millistream deletes an XETB instrument. |
+| 4 | **Retroactive cleanup** | Team Wolf | Blocked by #1 | Once the scope is known and the logic is defined, apply the OTC treatment to all existing affected positions identified in step 1. |
+
+### Context for the fix
+
+- **Pricing confusion (Lars's observation):** Positions mapped to Tradegate show real-time (15 min delayed) Tradegate prices, whereas before they likely had once-a-day or no live pricing. This change in price behavior plus the German flag appearing is what triggers customer calls. Treating as OTC resolves this.
+- **Vienna is not an option:** Nordnet clears Vienna via Citi custody, not directly via Clearstream. Vienna and Tradegate/Xetra are not fungible at Nordnet. Remapping to Vienna would cause clearing/settlement mismatches.
+- **This will recur:** Deutsche Börse periodically removes foreign stocks from Xetra Freiverkehr when there is low volume or no active Designated Sponsor. Each cleanup can create new orphaned positions for Nordic customers.
 
 ## Nordnet Supported Electronic Trading Markets
 
