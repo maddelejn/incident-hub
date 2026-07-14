@@ -70,10 +70,53 @@ When an instrument migrates from Xetra to Tradegate (due to XETB cleanup), non-G
 ### Immediate workaround
 The customer can sell via the **Trading Desk** (manual broker intervention). Because the shares are fungible, a broker can execute a sell order on the Vienna Stock Exchange (XVIE) where the primary listing is active and liquid.
 
+### Potential permanent fix
+**Vienna Stock Exchange is available for electronic self-service trading on Nordnet.** This means if the customer's position were remapped from the deleted Xetra instrument to the corresponding Vienna instrument (AT000AGRANA3 / AGRv on XVIE), the customer should be able to sell electronically without needing the Trading Desk.
+
+This requires:
+1. Confirming that a Vienna instrument for ISIN AT000AGRANA3 exists in the instrument database
+2. Remapping the customer's position from the deleted XETB instrument to the Vienna one
+3. Evaluating whether this should be done systematically for all orphaned XETB positions where a Vienna (or other supported market) instrument exists
+
+### Why the customer can't sell electronically
+
+The customer is blocked on all available electronic venues:
+
+| Venue | Status | Why they can't sell |
+|-------|--------|-------------------|
+| Xetra (XETB) | Deleted Sept 2025 | Instrument no longer exists in the system |
+| Tradegate | Active | German customers only |
+| Vienna (XVIE) | Active, primary listing | Position not linked to Vienna instrument |
+
+Vienna is available for electronic trading on Nordnet, but the customer's position is still tied to the deleted Xetra instrument, not the Vienna one. If remapped to Vienna, the customer could sell online.
+
 ### Open questions
 1. **How widespread is this?** Are there more Swedish/Nordic customers holding positions in instruments that moved from XETB to Tradegate after the September 2025 cleanup?
-2. **Should orphaned XETB positions be remapped?** For non-German customers, mapping to Vienna (XVIE) instead of Tradegate would restore electronic trading access - but it's unclear if Vienna is a supported trading venue on the platform.
-3. **How did the customer find the Tradegate instrument page?** In this specific case the position wasn't mapped to Tradegate on the back-end. Need to understand if customers are finding it via search or if the UI is showing it incorrectly.
+2. **Does a Vienna instrument exist for AT000AGRANA3?** If so, remapping the position would immediately restore electronic trading for this customer.
+3. **Should orphaned XETB positions be systematically remapped?** For non-German customers, positions on deleted XETB instruments should be checked against other supported markets (Vienna, Milan, Paris, etc.) and remapped where possible.
+4. **How did the customer find the Tradegate instrument page?** In this specific case the position wasn't mapped to Tradegate on the back-end. Need to understand if customers are finding it via search or if the UI is showing it incorrectly.
+
+## Nordnet Supported Electronic Trading Markets
+
+For reference, these markets are available for self-service electronic trading (web and app):
+
+| Region | Markets |
+|--------|---------|
+| Nordics | Sweden, Norway, Denmark, Finland (excl. Iceland) |
+| Germany | Xetra (+ Tradegate for German customers, rolling out) |
+| USA | NYSE, Nasdaq |
+| Canada | TSX, Venture |
+| UK | London Stock Exchange (FTSE350 only) |
+| Belgium | Euronext Brussels |
+| France | Euronext Paris |
+| Ireland | Euronext Dublin |
+| Italy | Milano Stock Exchange |
+| Netherlands | Euronext Amsterdam |
+| Portugal | Euronext Lisbon |
+| Switzerland | SIX Swiss Exchange |
+| Austria | Vienna Stock Exchange |
+| Spain | Madrid Stock Exchange |
+| Poland | Warsaw Stock Exchange (phone orders only) |
 
 ## Tradegate UI Behavior (Search, Instrument Page, Positions)
 
