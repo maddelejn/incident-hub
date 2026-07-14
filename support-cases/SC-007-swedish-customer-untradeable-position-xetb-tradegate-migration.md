@@ -105,6 +105,78 @@ For non-German customers, Tradegate instruments should not appear in search at a
 
 For fungible instruments (which is the normal Xetra/Tradegate case), the customer sees a single position and chooses the venue when they trade. This is consistent with the `tradableMappings` model in the instrument-id-mapper.
 
+## Tradegate Trading Details (from Horizon Demo)
+
+### Trading hours
+
+Tradegate offers significantly extended trading hours compared to Xetra:
+
+| Venue | Trading hours (CET) |
+|-------|-------------------|
+| Xetra | 09:00 - 17:30 |
+| Tradegate | 07:30 - 22:00 |
+
+This is a key selling point for German retail customers - the ability to react to market events outside standard Xetra hours.
+
+### Order flow architecture
+
+```
+Customer → Nordnet Platform → Virtu (Service Bureau) → Tradegate BSX
+                                                            ↓
+                                              Clearstream (CCP/CSD)
+                                                            ↓
+                                                   Citi (Account Operator)
+```
+
+- Nordnet holds the **Direct Membership** at Tradegate BSX
+- **Virtu** provides the technical connectivity and order routing under Nordnet's membership credentials
+- Orders are routed via Virtu's infrastructure but executed under Nordnet's exchange member ID
+- Settlement flows through **Clearstream** to **Citi** (Nordnet's account operator)
+
+### Instrument universe
+
+Tradegate covers approximately **10,000+ instruments** including:
+- German equities (DAX, MDAX, SDAX constituents)
+- International equities (US, European blue chips)
+- ETFs and ETPs
+
+Only **equities and depository receipts** are in scope for the Nordnet rollout. ETFs/ETPs are excluded from the initial launch.
+
+### Key differences from Xetra
+
+| Aspect | Xetra | Tradegate |
+|--------|-------|-----------|
+| Trading model | Central order book (auction + continuous) | Quote-driven (specialist/market maker) |
+| Trading hours | 09:00 - 17:30 CET | 07:30 - 22:00 CET |
+| Order types (Nordnet) | Limit | Limit initially, Market orders later |
+| Primary users | Institutional + retail | Retail-focused |
+| MIC | XETR | XGAT/XGRM |
+| Market ID | 4 | 85 |
+
+### Fungibility in practice
+
+When a German customer holds a position bought on Xetra and wants to sell on Tradegate (or vice versa):
+- No position transfer needed - it's the same clearing position at Clearstream
+- The UI shows one position row (fungible display)
+- Customer picks the venue in the order dialog at trade time
+- Settlement happens seamlessly through the same CSD
+
+### What German customers see (end-to-end flow)
+
+1. **Search**: Customer searches for a stock (e.g. "TRATON"). Sees one result in preferred view (Xetra). Can expand to "All tradables" to see Tradegate option.
+2. **Instrument page**: Shows market data. Venue selector dropdown shows Xetra (default) and Tradegate.
+3. **Order dialog**: Customer selects Buy/Sell, picks trade venue (Xetra or Tradegate), enters order details.
+4. **Position page**: Shows one row for the holding. Buy/Sell buttons open order dialog with venue selection.
+
+### What non-German customers see
+
+Nothing. Tradegate instruments are completely hidden:
+- Not visible in search
+- No venue selector on instrument pages
+- Cannot place orders
+
+This is why the SC-007 case is confusing - the Swedish customer somehow encountered a Tradegate instrument despite these restrictions.
+
 ## NPAP Change Record
 
 Tradegate was formally approved through NPAP **Change 362: Trading: Tradegate BSX**.
