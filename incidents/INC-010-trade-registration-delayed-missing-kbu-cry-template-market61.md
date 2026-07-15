@@ -19,7 +19,7 @@ tags: [trade-registration, abasec, instrument-creation, template-mapping, kbu, c
 
 ## Summary
 
-A trade on NGM MTF ETP Sweden (Market ID 61) for a crypto bull certificate (BULL XBT X15 VT3) could not be registered in Abasec because no instrument creation template existed for the combination: marketplace 61 + KBU + CRY + VPC. William Sörensen manually created the instrument at 21:10, but the trade was not registered until 22:10 - approximately 1 hour later. Two issues contributed: (1) a missing template mapping, and (2) the trade feeder's hourly retry cycle for failed trades.
+A trade on NGM MTF ETP Sweden (Market ID 61) for a crypto bull certificate (BULL XBT X15 VT3) could not be registered in Abasec because no instrument creation template existed for the combination: marketplace 61 + KBU + CRY + VPC. William Sörensen manually created the instrument at 21:10, but the trade was not registered until 22:10 - approximately 1 hour later. Three issues contributed: (1) a missing template mapping, (2) the instrument creator's Quartz schedule stopping at 20:20 with no runs until 22:10, and (3) the trade feeder's hourly retry cycle for failed trades.
 
 ## Timeline
 
@@ -29,10 +29,11 @@ A trade on NGM MTF ETP Sweden (Market ID 61) for a crypto bull certificate (BULL
 | 2026-07-14 ~21:00 | Trade executed on NGM MTF ETP Sweden. Trade feeder attempts to register in Abasec. |
 | ~21:00 | Instrument creation fails: `AbasecAddInstrumentFailedException: No template found for marketplace: 61, kind: KBU, exerciseType: NONE, assetClass: CRY, priceType: MonetaryAmount, clearingPlace: VPC` |
 | 21:10 | William Sörensen manually creates the Abasec instrument (insid registered at 21:10:18) |
-| 21:20 | Instrument creator Quartz job likely runs (evening schedule: every 20 min) - instrument should be synced |
+| 21:20 | Instrument creator Quartz job **did NOT run** - last evening run was at 20:20, schedule gap until 22:10 (Lars finding) |
 | **21:50** | **ResetTradesTask runs** (scheduled at :50 past each hour) - resets failed trade for retry |
-| **21:51** | **Trade feeder retries - still fails** (last error message from William) |
-| 22:10 | Trade successfully registered in Abasec |
+| **21:51** | **Trade feeder retries - still fails** (instrument not synced because instrument creator hasn't run since 20:20) |
+| **22:10** | **Instrument creator runs** (next scheduled run after 20:20 gap) - syncs the instrument |
+| ~22:10 | ReportingTask (5-min cycle) picks up the trade - **successfully registered** |
 
 ## Impact
 
@@ -93,14 +94,24 @@ When a trade fails in `abasec-trade-feeder`, it is not retried immediately. The 
 **Repo:** [abasec-trade-feeder](https://github.com/nordnet-private/abasec-trade-feeder)
 **Config:** `config/prod/service-abasec-trade-feeder/service-abasec-trade-feeder.yml`
 
-### Unresolved: 21:51 failure after instrument existed
+### 3. Instrument creator schedule gap (Lars's finding)
 
-The trade still failed at 21:51 even though:
-- The instrument was manually created at 21:10
-- The instrument creator Quartz job likely ran at 21:20 (syncing the instrument)
-- The ResetTradesTask ran at 21:50 (resetting the failed trade)
+The `service-abasec-instrument-creator` Quartz schedule has a gap in the evening. The last run in the evening window was at **20:20**. The next run was not until **22:10** (the night schedule). This means:
 
-This suggests a **propagation delay** between the instrument being created and the trade feeder being able to use it. Lars Mattsson is investigating whether the "get-instr" sync ran at 21:20 and what data path the trade feeder depends on to "see" the instrument.
+- William created the instrument manually at 21:10
+- But the instrument creator never ran between 20:20 and 22:10 to sync it
+- The trade feeder's retry at 21:51 still failed because the instrument wasn't synced
+- At 22:10 the instrument creator finally ran, synced the instrument, and the trade went through
+
+**The schedule needs to be extended to run every hour until 22:00** to cover this gap. Lars is creating a ticket to fix this.
+
+Current evening/night schedule:
+```
+Evening: 0 00,20,40 16-21 ? * MON-FRI *   → last run at ~20:40 (or 20:20?)
+Night:   0 00,15 22 ? * MON-FRI *         → next run at 22:00
+```
+
+The gap between ~20:20/20:40 and 22:00 leaves up to ~1.5 hours where no instrument sync runs.
 
 ## Trade Details
 
@@ -177,8 +188,8 @@ William manually created the instrument at 21:10. The trade was eventually regis
 | # | Action | Owner | Status | Details |
 |---|--------|-------|--------|---------|
 | 1 | **Add KBU+CRY and KBE+CRY templates for marketplace 61** | Team Wolf / Team ET | Open | New migration in `abasec-instrument-creator` similar to V1_025 (market 11). Need to confirm correct `tmpl_insid` values. |
-| 2 | **Investigate 21:51 failure** | Lars Mattsson (Team Wolf) | Investigating | Why did the trade still fail at 21:51 when the instrument was created at 21:10 and likely synced at 21:20? Possible propagation delay in instrument visibility. |
-| 3 | **Evaluate retry interval** | Team ET | Open | The 1-hour `ResetTradesTask` interval means manual instrument creation has no immediate effect on failed trades. Options: shorter interval, manual retry endpoint, or event-driven retry when instrument is created. |
+| 2 | **Extend instrument creator schedule to cover evening gap** | Lars Mattsson (Team Wolf) | Ticket being created | The Quartz schedule stops running at ~20:20/20:40 and doesn't resume until 22:00. Needs to run every hour until 22:00. Lars is creating a ticket and aiming to fix this week. |
+| 3 | **Evaluate trade feeder retry interval** | Team ET | Open | The 1-hour `ResetTradesTask` interval means manual instrument creation has no immediate effect on failed trades. Options: shorter interval, manual retry endpoint, or event-driven retry when instrument is created. |
 | 4 | **Audit all market 61 template mappings** | Team Wolf | Open | Check if other instrument type + asset class combinations are missing for market 61 compared to markets 11, 53, 24, 62. |
 
 ## Stakeholders
